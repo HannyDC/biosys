@@ -1,8 +1,16 @@
 import flet as ft 
+import alta_usuario as al
+import consulta_usuario as cu
 
 def main (page: ft.Page):
     def mostrar_registro(e:ft.ControlEvent):
         page.clean()
+        al.main(page)
+
+    def consultar_usuario(e:ft.ControlEvent):
+        page.clean()
+        cu.main(page)
+
     #configuracion de la pagina
     page.title="Menu principal"
     page.theme_mode="light"
@@ -15,8 +23,13 @@ def main (page: ft.Page):
         bgcolor="pink"
     )
     #Componentes de la pagina 
-    btn_registro=ft.ElevatedButton("Registro")
-    btn_consultas=ft.ElevatedButton("Consulta")
+    btn_registro=ft.FilledButton(
+        text = "Registro",
+        on_click=mostrar_registro)
+        
+    btn_consultas=ft.FilledButton(
+        text= "Consulta",
+        on_click=consultar_usuario)
     #Añadir a la pagina 
     page.add(btn_registro,btn_consultas)
     page.update()
