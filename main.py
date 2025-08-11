@@ -1,7 +1,9 @@
 import flet as ft
 import principal as pr
-import modelo as md
+#import modelo as md
 import alta_usuario as al
+from airtable import usuario as Usuario 
+from pyairtable.formulas import match
 
 def main(page: ft.Page):
 
@@ -10,30 +12,22 @@ def main(page: ft.Page):
         al.main(page)
 
     def ingresar(e: ft.ControlEvent):
-                #validar campos
-        usuario = txt_usuario.value
-        Contraseña = txt_pass.value
-        snackbar = ft.SnackBar(ft.Text("Introduce tu usuario"), bgcolor="blue", show_close_icon=True)
-        if usuario == "":
-            snackbar.content = (ft.Text("Introduce tu usuario"))
-            page.open(snackbar)
-            return
-        elif Contraseña == "":
-            snackbar.content = (ft.Text("Introduce tu contraseña"))
-            page.open(snackbar)
-            return
 
-        #verificar usuario en la base de datos
-        x= md.Usuario.select().where(
-            md.Usuario.clave == usuario,
-            md.Usuario.contra == Contraseña
-        ) 
-        if len(x) == 0:
-            snackbar.content = ft.Text("Credenciales incorrectas")
-            page.open(snackbar)
-        else:
-            page.clean()
-            pr.main(page)
+        usuario_valor = txt_usuario.value.strip()
+        password_valor = txt_contraseña.value.strip()
+        try:
+            formula = match ({"clave": usuario_valor, "contra": password_valor })
+            registro = Usuario.first(formula=formula)
+            if registro:
+                print("¡Funciona!")
+                page.clean()
+                pr.main(page)  
+            else:
+                print(f"Usuario '{usuario_valor}' no encontrado.")
+                
+        except Exception as e:
+            print(f"Error de Airtable: {e}")
+    
 
     # Configuración de la página
     page.theme_mode = "light"
@@ -57,7 +51,7 @@ def main(page: ft.Page):
 
     # Campos de texto
     txt_usuario = ft.TextField(label="Usuario o Correo", width=300)
-    txt_pass = ft.TextField(label="Contraseña", password=True, can_reveal_password=True, width=300)
+    txt_contraseña = ft.TextField(label="Contraseña", password=True, can_reveal_password=True, width=300)
 
     incio_sesion = ft.TextButton(
         text="¿No tienes una cuenta? ¡Registrate aqui!",
@@ -96,7 +90,7 @@ def main(page: ft.Page):
                 logo,
                 titulo,
                 txt_usuario,
-                txt_pass,
+                txt_contraseña,
                 btn_login,
                 incio_sesion
             ],
